@@ -63,4 +63,20 @@ public class User {
     public void setArsWallet(ArsWallet userArsWallet) {
         this.arsWallet = userArsWallet;
     }
+
+    public void setUsdWallet(UsdWallet wallet){
+        this.usdWallet = wallet;
+    }
+
+    public UsdWallet getUsdWallet() {
+        return this.usdWallet;
+    }
+
+    public void setUsdtWallet(UsdtWallet wallet){
+        this.usdtWallet = wallet;
+    }
+
+    public UsdtWallet getUsdtWallet() {
+        return this.usdtWallet;
+    }
 }
