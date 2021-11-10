@@ -8,6 +8,12 @@ public class UsdWallet extends Wallet{
     public UsdWallet(){}
 
     public UsdWallet(String ownerId){
-        super(ownerId,2);
+        super(ownerId);
+
+    }
+
+    @Override
+    protected int getCurrencyDecimals() {
+        return 2;
     }
 }

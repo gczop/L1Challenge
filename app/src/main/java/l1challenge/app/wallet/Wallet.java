@@ -15,13 +15,11 @@ public abstract class Wallet {
     protected int id;
     protected String value;
     protected String ownerId;
-    protected int decimals;
 
     public Wallet(){}
-    public Wallet(String ownerId, int decimals){
-        this.value = BigDecimal.ZERO.setScale(decimals).toString();
+    public Wallet(String ownerId){
+        this.value = BigDecimal.ZERO.setScale(getCurrencyDecimals()).toPlainString();
         this.ownerId = ownerId;
-        this.decimals = decimals;
     }
 
     public void setId(int id){
@@ -33,11 +31,11 @@ public abstract class Wallet {
     }
 
     public void setValue(String value){
-        this.value = new BigDecimal(value).setScale(decimals).toString();
+        this.value = new BigDecimal(value).setScale(getCurrencyDecimals()).toPlainString();
     }
 
     public String getValue(){
-        return this.value.toString();
+        return this.value;
     }
 
     public void setOwnerId(String ownerId){
@@ -48,21 +46,15 @@ public abstract class Wallet {
         return this.ownerId;
     }
 
-    public void setDecimals(int decimals){
-        this.decimals = decimals;
-    }
-
-    public int getDecimals(){
-        return this.decimals;
-    }
-
     public void addAmount(String amountString){
-        BigDecimal amount = new BigDecimal(amountString).setScale(decimals, RoundingMode.HALF_UP);
-        value = new BigDecimal(value).add(amount).toString();
+        BigDecimal amount = new BigDecimal(amountString).setScale(getCurrencyDecimals(), RoundingMode.HALF_UP);
+        value = new BigDecimal(value).add(amount).toPlainString();
     }
+
+    protected abstract int getCurrencyDecimals();
 
     public void extractAmount(String amountString){
-        BigDecimal amount = new BigDecimal(amountString).setScale(decimals,  RoundingMode.HALF_UP);
+        BigDecimal amount = new BigDecimal(amountString).setScale(getCurrencyDecimals(),  RoundingMode.HALF_UP);
         value = new BigDecimal(value).subtract(amount).toString();
     }
 

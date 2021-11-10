@@ -8,8 +8,14 @@ public class ArsWallet extends Wallet{
 
     public ArsWallet(){    }
 
+
     public ArsWallet(String ownerId){
-        super(ownerId, 2);
+        super(ownerId);
+    }
+
+    @Override
+    protected int getCurrencyDecimals() {
+        return 2;
     }
 
 }
