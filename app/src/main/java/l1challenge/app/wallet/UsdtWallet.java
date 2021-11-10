@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 @Entity
 public class UsdtWallet extends Wallet{
-    public UsdtWallet(){}
+    public UsdtWallet(){    }
 
     public UsdtWallet(String ownerId){
         super(ownerId, 8);

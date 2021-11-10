@@ -73,6 +73,20 @@ public class UserController {
         return false;
     }
 
+    @PostMapping(path="/user/extraction")
+    public @ResponseBody boolean makeExtractionToUser(@RequestParam String coin, @RequestParam String userDni, @RequestParam String amount){
+        String operationCoin = coin.toUpperCase();
+        switch(operationCoin){
+            case "ARS":
+                return makeExtraction(arsWalletRepository, userDni, amount);
+            case "USD":
+                return makeExtraction(usdWalletRepository, userDni, amount);
+            case "USDT":
+                return makeExtraction(usdtWalletRepository, userDni, amount);
+        }
+        return false;
+    }
+
     private boolean makeDeposit(WalletRepository walletRepository, String userDni, String amount) {
         Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
         wallet.addAmount(amount);
@@ -80,5 +94,11 @@ public class UserController {
         return true;
     }
 
+    private boolean makeExtraction(WalletRepository walletRepository, String userDni, String amount) {
+        Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
+        wallet.extractAmount(amount);
+        walletRepository.save(wallet);
+        return true;
+    }
 
 }

@@ -13,14 +13,15 @@ public abstract class Wallet {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     protected int id;
-    protected BigDecimal value;
+    protected String value;
     protected String ownerId;
     protected int decimals;
 
     public Wallet(){}
     public Wallet(String ownerId, int decimals){
-        this.value = BigDecimal.ZERO.setScale(decimals, RoundingMode.HALF_UP);
+        this.value = BigDecimal.ZERO.setScale(decimals).toString();
         this.ownerId = ownerId;
+        this.decimals = decimals;
     }
 
     public void setId(int id){
@@ -32,7 +33,7 @@ public abstract class Wallet {
     }
 
     public void setValue(String value){
-        this.value = new BigDecimal(value).setScale(decimals, RoundingMode.HALF_UP);
+        this.value = new BigDecimal(value).setScale(decimals).toString();
     }
 
     public String getValue(){
@@ -47,8 +48,22 @@ public abstract class Wallet {
         return this.ownerId;
     }
 
-    public void addAmount(String amountString){
-        BigDecimal amount = new BigDecimal(amountString).setScale(decimals,  RoundingMode.HALF_UP);
-        value = value.add(amount);
+    public void setDecimals(int decimals){
+        this.decimals = decimals;
     }
+
+    public int getDecimals(){
+        return this.decimals;
+    }
+
+    public void addAmount(String amountString){
+        BigDecimal amount = new BigDecimal(amountString).setScale(decimals, RoundingMode.HALF_UP);
+        value = new BigDecimal(value).add(amount).toString();
+    }
+
+    public void extractAmount(String amountString){
+        BigDecimal amount = new BigDecimal(amountString).setScale(decimals,  RoundingMode.HALF_UP);
+        value = new BigDecimal(value).subtract(amount).toString();
+    }
+
 }
