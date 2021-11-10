@@ -1,13 +1,11 @@
 package l1challenge.app.controllers;
 
 import l1challenge.app.User;
-import l1challenge.app.repositories.ArsWalletRepository;
-import l1challenge.app.repositories.UsdWalletRepository;
-import l1challenge.app.repositories.UsdtWalletRepository;
-import l1challenge.app.repositories.UserRepository;
+import l1challenge.app.repositories.*;
 import l1challenge.app.wallet.ArsWallet;
 import l1challenge.app.wallet.UsdWallet;
 import l1challenge.app.wallet.UsdtWallet;
+import l1challenge.app.wallet.Wallet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
-@RequestMapping(path="/demo")
+@RequestMapping(path="/api")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
@@ -31,7 +29,7 @@ public class UserController {
 
 
 
-    @PostMapping(path="/add") // Map ONLY POST Requests
+    @PostMapping(path="/user") // Map ONLY POST Requests
     public @ResponseBody String addNewUser (@RequestParam String name, @RequestParam String surname, @RequestParam String dni) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
@@ -44,12 +42,12 @@ public class UserController {
         return "Saved";
     }
 
-    @GetMapping(path="/all")
+    @GetMapping(path="/users/all")
     public @ResponseBody Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @GetMapping(path="/get")
+    @GetMapping(path="/user")
     public @ResponseBody User getUserById(@RequestParam String dni) {
         User selectedUser = userRepository.findById(dni).get();
         ArsWallet userArsWallet = arsWalletRepository.findWalletByOwnerId(selectedUser.getDni());
@@ -59,6 +57,27 @@ public class UserController {
         selectedUser.setUsdWallet(userUsdWallet);
         selectedUser.setUsdtWallet(userUsdtWallet);
         return selectedUser;
+    }
+
+    @PostMapping(path="/user/deposit")
+    public @ResponseBody boolean makeDepositToUser(@RequestParam String coin, @RequestParam String userDni, @RequestParam String amount){
+        String operationCoin = coin.toUpperCase();
+        switch(operationCoin){
+            case "ARS":
+                return makeDeposit(arsWalletRepository, userDni, amount);
+            case "USD":
+                return makeDeposit(usdWalletRepository, userDni, amount);
+            case "USDT":
+                return makeDeposit(usdtWalletRepository, userDni, amount);
+        }
+        return false;
+    }
+
+    private boolean makeDeposit(WalletRepository walletRepository, String userDni, String amount) {
+        Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
+        wallet.addAmount(amount);
+        walletRepository.save(wallet);
+        return true;
     }
 
 

@@ -5,6 +5,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @MappedSuperclass
 public abstract class Wallet {
@@ -12,13 +13,13 @@ public abstract class Wallet {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     protected int id;
-    protected String value;
+    protected BigDecimal value;
     protected String ownerId;
-    protected String decimals;
+    protected int decimals;
 
     public Wallet(){}
-    public Wallet(BigDecimal value, String ownerId, int decimals){
-        this.value = value.setScale(decimals).toString();
+    public Wallet(String ownerId, int decimals){
+        this.value = BigDecimal.ZERO.setScale(decimals, RoundingMode.HALF_UP);
         this.ownerId = ownerId;
     }
 
@@ -31,11 +32,11 @@ public abstract class Wallet {
     }
 
     public void setValue(String value){
-        this.value = value;
+        this.value = new BigDecimal(value).setScale(decimals, RoundingMode.HALF_UP);
     }
 
     public String getValue(){
-        return this.value;
+        return this.value.toString();
     }
 
     public void setOwnerId(String ownerId){
@@ -46,4 +47,8 @@ public abstract class Wallet {
         return this.ownerId;
     }
 
+    public void addAmount(String amountString){
+        BigDecimal amount = new BigDecimal(amountString).setScale(decimals,  RoundingMode.HALF_UP);
+        value = value.add(amount);
+    }
 }

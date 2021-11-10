@@ -9,10 +9,7 @@ public class ArsWallet extends Wallet{
     public ArsWallet(){}
 
     public ArsWallet(String ownerId){
-        super(BigDecimal.ZERO, ownerId, 2);
+        super(ownerId, 2);
     }
 
-    public void test(){
-
-    }
 }

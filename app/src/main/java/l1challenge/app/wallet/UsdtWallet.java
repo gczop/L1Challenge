@@ -8,6 +8,6 @@ public class UsdtWallet extends Wallet{
     public UsdtWallet(){}
 
     public UsdtWallet(String ownerId){
-        super(BigDecimal.ZERO, ownerId, 8);
+        super(ownerId, 8);
     }
 }
