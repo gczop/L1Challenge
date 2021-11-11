@@ -18,4 +18,9 @@ public class ArsWallet extends Wallet{
         return 2;
     }
 
+    @Override
+    public String getCurrency() {
+        return "ARS";
+    }
+
 }

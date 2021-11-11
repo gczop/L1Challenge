@@ -1,7 +1,9 @@
 package l1challenge.app.controllers;
 
+import l1challenge.app.Operation;
 import l1challenge.app.User;
 import l1challenge.app.repositories.*;
+import l1challenge.app.utils.OperationTypes;
 import l1challenge.app.wallet.ArsWallet;
 import l1challenge.app.wallet.UsdWallet;
 import l1challenge.app.wallet.UsdtWallet;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 @Controller
@@ -26,6 +31,8 @@ public class UserController {
     private UsdWalletRepository usdWalletRepository;
     @Autowired
     private UsdtWalletRepository usdtWalletRepository;
+    @Autowired
+    private OperationRepository operationRepository;
 
 
 
@@ -91,6 +98,8 @@ public class UserController {
         Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
         wallet.addAmount(amount);
         walletRepository.save(wallet);
+        Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.DEPOSIT);
+        operationRepository.save(newOperation);
         return true;
     }
 
@@ -98,7 +107,15 @@ public class UserController {
         Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
         wallet.extractAmount(amount);
         walletRepository.save(wallet);
+        Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.EXTRACTION);
+        operationRepository.save(newOperation);
         return true;
+    }
+
+    private String getCurrentDate(){
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        return formatter.format(date);
     }
 
 }

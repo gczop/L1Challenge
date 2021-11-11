@@ -51,11 +51,12 @@ public abstract class Wallet {
         value = new BigDecimal(value).add(amount).toPlainString();
     }
 
-    protected abstract int getCurrencyDecimals();
-
     public void extractAmount(String amountString){
         BigDecimal amount = new BigDecimal(amountString).setScale(getCurrencyDecimals(),  RoundingMode.HALF_UP);
         value = new BigDecimal(value).subtract(amount).toString();
     }
+
+    protected abstract int getCurrencyDecimals();
+    public abstract String getCurrency();
 
 }

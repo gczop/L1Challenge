@@ -16,4 +16,10 @@ public class UsdWallet extends Wallet{
     protected int getCurrencyDecimals() {
         return 2;
     }
+
+    @Override
+    public String getCurrency() {
+        return "USD";
+    }
+
 }
