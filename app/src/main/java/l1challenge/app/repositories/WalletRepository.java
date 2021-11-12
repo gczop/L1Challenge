@@ -7,6 +7,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface WalletRepository<T extends Wallet> extends CrudRepository<T, Integer> {
 
-    T findWalletByOwnerId(String ownerId);
+    T findWalletByOwnerAlias(String ownerAlias);
 
 }

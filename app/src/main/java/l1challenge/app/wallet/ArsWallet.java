@@ -9,8 +9,8 @@ public class ArsWallet extends Wallet{
     public ArsWallet(){    }
 
 
-    public ArsWallet(String ownerId){
-        super(ownerId);
+    public ArsWallet(String ownerAlias){
+        super(ownerAlias);
     }
 
     @Override

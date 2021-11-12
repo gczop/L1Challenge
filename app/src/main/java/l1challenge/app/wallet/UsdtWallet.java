@@ -8,8 +8,8 @@ public class UsdtWallet extends Wallet{
     public UsdtWallet(){
     }
 
-    public UsdtWallet(String ownerId){
-        super(ownerId);
+    public UsdtWallet(String ownerAlias){
+        super(ownerAlias);
     }
 
     @Override

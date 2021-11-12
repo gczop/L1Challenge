@@ -1,5 +1,6 @@
 package l1challenge.app;
 
+import com.google.gson.JsonObject;
 import l1challenge.app.utils.OperationTypes;
 
 import javax.persistence.Entity;
@@ -78,4 +79,14 @@ public class Operation {
     }
 
 
+    public JsonObject mapToJsonObject() {
+        JsonObject jo = new JsonObject();
+        jo.addProperty("operationId", this.operationId);
+        jo.addProperty("wallet", this.wallet);
+        jo.addProperty("currency", this.currency);
+        jo.addProperty("date", this.date);
+        jo.addProperty("amount", this.amount);
+        jo.addProperty("type", this.type.toString());
+        return jo;
+    }
 }

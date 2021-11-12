@@ -1,9 +1,11 @@
 package l1challenge.app.controllers;
 
+import com.google.gson.JsonObject;
 import l1challenge.app.Operation;
 import l1challenge.app.User;
 import l1challenge.app.repositories.*;
 import l1challenge.app.utils.OperationTypes;
+import l1challenge.app.utils.ResponseMaker;
 import l1challenge.app.wallet.ArsWallet;
 import l1challenge.app.wallet.UsdWallet;
 import l1challenge.app.wallet.UsdtWallet;
@@ -23,6 +25,7 @@ import java.util.Date;
 @Controller
 @RequestMapping(path="/api")
 public class UserController {
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -36,30 +39,25 @@ public class UserController {
 
 
 
-    @PostMapping(path="/user") // Map ONLY POST Requests
-    public @ResponseBody String addNewUser (@RequestParam String name, @RequestParam String surname, @RequestParam String dni) {
-        // @ResponseBody means the returned String is the response, not a view name
-        // @RequestParam means it is a parameter from the GET or POST request
-
-        User n = new User(dni, name, surname);
+    @PostMapping(path="/user")
+    public @ResponseBody
+    JsonObject addNewUser (@RequestParam String name, @RequestParam String surname, @RequestParam String alias, @RequestParam String email) {
+        User n = new User(name, surname, email, alias);
+        //TODO: Chequear que no se repita email/alias. No repetir billeteras.
         userRepository.save(n);
         arsWalletRepository.save(n.getArsWallet());
         usdWalletRepository.save(n.getUsdWallet());
         usdtWalletRepository.save(n.getUsdtWallet());
-        return "Saved";
-    }
-
-    @GetMapping(path="/users/all")
-    public @ResponseBody Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+        return ResponseMaker.makeOkResponse();
     }
 
     @GetMapping(path="/user")
-    public @ResponseBody User getUserById(@RequestParam String dni) {
-        User selectedUser = userRepository.findById(dni).get();
-        ArsWallet userArsWallet = arsWalletRepository.findWalletByOwnerId(selectedUser.getDni());
-        UsdWallet userUsdWallet = usdWalletRepository.findWalletByOwnerId(selectedUser.getDni());
-        UsdtWallet userUsdtWallet = usdtWalletRepository.findWalletByOwnerId(selectedUser.getDni());
+    public @ResponseBody User getUser(@RequestParam String alias) {
+        User selectedUser = userRepository.findByAlias(alias);
+        //TODO: Ver de mejorar esto y que no tenga que usar repositorios.
+        ArsWallet userArsWallet = arsWalletRepository.findWalletByOwnerAlias(selectedUser.getAlias());
+        UsdWallet userUsdWallet = usdWalletRepository.findWalletByOwnerAlias(selectedUser.getAlias());
+        UsdtWallet userUsdtWallet = usdtWalletRepository.findWalletByOwnerAlias(selectedUser.getAlias());
         selectedUser.setArsWallet(userArsWallet);
         selectedUser.setUsdWallet(userUsdWallet);
         selectedUser.setUsdtWallet(userUsdtWallet);
@@ -67,35 +65,35 @@ public class UserController {
     }
 
     @PostMapping(path="/user/deposit")
-    public @ResponseBody boolean makeDepositToUser(@RequestParam String coin, @RequestParam String userDni, @RequestParam String amount){
+    public @ResponseBody boolean makeDepositToUser(@RequestParam String coin, @RequestParam String alias, @RequestParam String amount){
         String operationCoin = coin.toUpperCase();
         switch(operationCoin){
             case "ARS":
-                return makeDeposit(arsWalletRepository, userDni, amount);
+                return makeDeposit(arsWalletRepository, alias, amount);
             case "USD":
-                return makeDeposit(usdWalletRepository, userDni, amount);
+                return makeDeposit(usdWalletRepository, alias, amount);
             case "USDT":
-                return makeDeposit(usdtWalletRepository, userDni, amount);
+                return makeDeposit(usdtWalletRepository, alias, amount);
         }
         return false;
     }
 
     @PostMapping(path="/user/extraction")
-    public @ResponseBody boolean makeExtractionToUser(@RequestParam String coin, @RequestParam String userDni, @RequestParam String amount){
+    public @ResponseBody boolean makeExtractionToUser(@RequestParam String coin, @RequestParam String alias, @RequestParam String amount){
         String operationCoin = coin.toUpperCase();
         switch(operationCoin){
             case "ARS":
-                return makeExtraction(arsWalletRepository, userDni, amount);
+                return makeExtraction(arsWalletRepository, alias, amount);
             case "USD":
-                return makeExtraction(usdWalletRepository, userDni, amount);
+                return makeExtraction(usdWalletRepository, alias, amount);
             case "USDT":
-                return makeExtraction(usdtWalletRepository, userDni, amount);
+                return makeExtraction(usdtWalletRepository, alias, amount);
         }
         return false;
     }
 
-    private boolean makeDeposit(WalletRepository walletRepository, String userDni, String amount) {
-        Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
+    private boolean makeDeposit(WalletRepository walletRepository, String userAlias, String amount) {
+        Wallet wallet = walletRepository.findWalletByOwnerAlias(userAlias);
         wallet.addAmount(amount);
         walletRepository.save(wallet);
         Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.DEPOSIT);
@@ -103,8 +101,8 @@ public class UserController {
         return true;
     }
 
-    private boolean makeExtraction(WalletRepository walletRepository, String userDni, String amount) {
-        Wallet wallet = walletRepository.findWalletByOwnerId(userDni);
+    private boolean makeExtraction(WalletRepository walletRepository, String userAlias, String amount) {
+        Wallet wallet = walletRepository.findWalletByOwnerAlias(userAlias);
         wallet.extractAmount(amount);
         walletRepository.save(wallet);
         Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.EXTRACTION);

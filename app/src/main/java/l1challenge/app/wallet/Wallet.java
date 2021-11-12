@@ -14,12 +14,12 @@ public abstract class Wallet {
     @GeneratedValue(strategy= GenerationType.AUTO)
     protected int id;
     protected String value;
-    protected String ownerId;
+    protected String ownerAlias;
 
     public Wallet(){}
-    public Wallet(String ownerId){
+    public Wallet(String ownerAlias){
         this.value = BigDecimal.ZERO.setScale(getCurrencyDecimals()).toPlainString();
-        this.ownerId = ownerId;
+        this.ownerAlias = ownerAlias;
     }
 
     public void setId(int id){
@@ -38,12 +38,12 @@ public abstract class Wallet {
         return this.value;
     }
 
-    public void setOwnerId(String ownerId){
-        this.ownerId = ownerId;
+    public void setOwnerAlias(String ownerAlias){
+        this.ownerAlias = ownerAlias;
     }
 
-    public String getOwnerId() {
-        return this.ownerId;
+    public String getOwnerAlias() {
+        return this.ownerAlias;
     }
 
     public void addAmount(String amountString){

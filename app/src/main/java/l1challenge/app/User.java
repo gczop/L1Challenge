@@ -10,9 +10,12 @@ import javax.persistence.*;
 @Entity
 public class User {
     @Id
-    private String dni;
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
+    private String alias;
     private String name;
     private String surname;
+    private String email;
 
     @Transient
     private ArsWallet arsWallet;
@@ -23,22 +26,14 @@ public class User {
 
     public User(){}
 
-    public User(String dni, String name, String surname){
-        this.dni = dni;
+    public User(String name, String surname, String email, String alias){
         this.name = name;
         this.surname = surname;
-        arsWallet = new ArsWallet(dni);
-        usdWallet = new UsdWallet(dni);
-        usdtWallet = new UsdtWallet(dni);
-    }
-
-
-    public void setDni(String dni){
-        this.dni = dni;
-    }
-
-    public String getDni(){
-        return this.dni;
+        this.alias = alias;
+        this.email = email;
+        arsWallet = new ArsWallet(alias);
+        usdWallet = new UsdWallet(alias);
+        usdtWallet = new UsdtWallet(alias);
     }
 
     public void setName(String name){
@@ -57,20 +52,48 @@ public class User {
         return this.surname;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
     public ArsWallet getArsWallet(){
         return this.arsWallet;
     }
+
     public void setArsWallet(ArsWallet userArsWallet) {
         this.arsWallet = userArsWallet;
-    }
-
-    public void setUsdWallet(UsdWallet wallet){
-        this.usdWallet = wallet;
     }
 
     public UsdWallet getUsdWallet() {
         return this.usdWallet;
     }
+
+
+    public void setUsdWallet(UsdWallet wallet){
+        this.usdWallet = wallet;
+    }
+
 
     public void setUsdtWallet(UsdtWallet wallet){
         this.usdtWallet = wallet;

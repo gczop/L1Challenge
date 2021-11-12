@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 public class UsdWallet extends Wallet{
     public UsdWallet(){}
 
-    public UsdWallet(String ownerId){
-        super(ownerId);
+    public UsdWallet(String ownerAlias){
+        super(ownerAlias);
 
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface OperationRepository extends CrudRepository<Operation, Integer> {
 
-    //@Query("select * from operation o where o.wallet in (?1,?2,?3)")
+    //@Query("select o from Operation o where o.wallet in (?1)")
     public Iterable<Operation> findByWalletIn(List<Integer> walletIds);
 
 }
