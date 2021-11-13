@@ -4,7 +4,11 @@ public class OperationTypes {
 
     public static enum OPERATION_TYPE{
         EXTRACTION,
-        DEPOSIT
+        DEPOS
     }
+
+
+    final public static String EXTRACTION = "EXTRACTION";
+    final public static String DEPOSIT = "DEPOSIT";
 
 }

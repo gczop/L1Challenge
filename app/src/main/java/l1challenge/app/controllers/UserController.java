@@ -99,7 +99,7 @@ public class UserController {
             return ResponseMaker.makeInvalidOperationResultResponse();
         }
         walletRepository.save(wallet);
-        Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.DEPOSIT);
+        Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.DEPOSIT);
         operationRepository.save(newOperation);
         return ResponseMaker.makeOkResponse();
     }
@@ -111,7 +111,7 @@ public class UserController {
             return ResponseMaker.makeInvalidOperationResultResponse();
         }
         walletRepository.save(wallet);
-        Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.EXTRACTION);
+        Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.EXTRACTION);
         operationRepository.save(newOperation);
         return ResponseMaker.makeOkResponse();
     }

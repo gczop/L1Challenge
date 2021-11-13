@@ -7,6 +7,7 @@ import l1challenge.app.repositories.ArsWalletRepository;
 import l1challenge.app.repositories.OperationRepository;
 import l1challenge.app.repositories.UsdWalletRepository;
 import l1challenge.app.repositories.UsdtWalletRepository;
+import l1challenge.app.utils.OperationTypes;
 import l1challenge.app.wallet.Wallet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,7 @@ public class OperationController {
 
     @GetMapping(path="/operations")
     public @ResponseBody
-    JsonArray getUserOperations(@RequestParam String alias) {
+    JsonArray getUserOperations(@RequestParam String alias, @RequestParam(required = false) String currency, @RequestParam(required = false) String type, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Integer offset ) {
         Wallet arsWallet = arsWalletRepository.findWalletByOwnerAlias(alias);
         Wallet usdWallet = usdWalletRepository.findWalletByOwnerAlias(alias);
         Wallet usdtWallet = usdtWalletRepository.findWalletByOwnerAlias(alias);
@@ -40,7 +41,7 @@ public class OperationController {
         idList.add(arsWallet.getId());
         idList.add(usdWallet.getId());
         idList.add(usdtWallet.getId());
-        Iterable<Operation> ops = operationsRepository.findByWalletIn(idList);
+        Iterable<Operation> ops = operationsRepository.findOperationsWithFilters(idList, type, currency, (limit == null)?100:limit, (offset==null)?0:offset);
         return mapOperationIterableToJsonArray(ops);
     }
 

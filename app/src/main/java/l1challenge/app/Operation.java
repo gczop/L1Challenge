@@ -19,10 +19,10 @@ public class Operation {
     private String currency;
     private String amount;
     private String date;
-    private OperationTypes.OPERATION_TYPE type;
+    private String type;
 
     public Operation(){}
-    public Operation(int wallet, String currency, String amount, String date, OperationTypes.OPERATION_TYPE type){
+    public Operation(int wallet, String currency, String amount, String date, String type){
         this.wallet = wallet;
         this.currency = currency;
         this.amount = amount;
@@ -70,11 +70,11 @@ public class Operation {
         this.date = date;
     }
 
-    public OperationTypes.OPERATION_TYPE getType() {
+    public String getType() {
         return this.type;
     }
 
-    public void setType(OperationTypes.OPERATION_TYPE type){
+    public void setType(String type){
         this.type = type;
     }
 
