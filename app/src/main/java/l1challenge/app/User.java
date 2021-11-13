@@ -12,9 +12,11 @@ public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private int id;
+    @Column(unique = true)
     private String alias;
     private String name;
     private String surname;
+    @Column(unique = true)
     private String email;
 
     @Transient

@@ -46,14 +46,26 @@ public abstract class Wallet {
         return this.ownerAlias;
     }
 
-    public void addAmount(String amountString){
-        BigDecimal amount = new BigDecimal(amountString).setScale(getCurrencyDecimals(), RoundingMode.HALF_UP);
-        value = new BigDecimal(value).add(amount).toPlainString();
+    public boolean addAmount(String amountString){
+        BigDecimal amount = new BigDecimal(amountString);
+        if(amount.scale() > getCurrencyDecimals()){
+            return false;
+        }
+        value = new BigDecimal(value).add(amount).setScale(getCurrencyDecimals(), RoundingMode.FLOOR).toPlainString();
+        return true;
     }
 
-    public void extractAmount(String amountString){
-        BigDecimal amount = new BigDecimal(amountString).setScale(getCurrencyDecimals(),  RoundingMode.HALF_UP);
-        value = new BigDecimal(value).subtract(amount).toString();
+    public boolean extractAmount(String amountString){
+        BigDecimal amount = new BigDecimal(amountString);
+        if(amount.scale() > getCurrencyDecimals()){
+            return false;
+        }
+        BigDecimal result = new BigDecimal(value).subtract(amount).setScale(getCurrencyDecimals(),  RoundingMode.FLOOR);
+        if(result.compareTo(BigDecimal.ZERO) == -1){
+            return false;
+        }
+        value = result.toString();
+        return true;
     }
 
     protected abstract int getCurrencyDecimals();

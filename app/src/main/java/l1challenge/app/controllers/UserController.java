@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @PostMapping(path="/user/deposit")
-    public @ResponseBody boolean makeDepositToUser(@RequestParam String coin, @RequestParam String alias, @RequestParam String amount){
+    public @ResponseBody JsonObject makeDepositToUser(@RequestParam String coin, @RequestParam String alias, @RequestParam String amount){
         String operationCoin = coin.toUpperCase();
         switch(operationCoin){
             case "ARS":
@@ -75,11 +75,11 @@ public class UserController {
             case "USDT":
                 return makeDeposit(usdtWalletRepository, alias, amount);
         }
-        return false;
+        return ResponseMaker.makeInvalidCurrencyResponse();
     }
 
     @PostMapping(path="/user/extraction")
-    public @ResponseBody boolean makeExtractionToUser(@RequestParam String coin, @RequestParam String alias, @RequestParam String amount){
+    public @ResponseBody JsonObject makeExtractionToUser(@RequestParam String coin, @RequestParam String alias, @RequestParam String amount){
         String operationCoin = coin.toUpperCase();
         switch(operationCoin){
             case "ARS":
@@ -89,25 +89,31 @@ public class UserController {
             case "USDT":
                 return makeExtraction(usdtWalletRepository, alias, amount);
         }
-        return false;
+        return ResponseMaker.makeInvalidCurrencyResponse();
     }
 
-    private boolean makeDeposit(WalletRepository walletRepository, String userAlias, String amount) {
+    private JsonObject makeDeposit(WalletRepository walletRepository, String userAlias, String amount) {
         Wallet wallet = walletRepository.findWalletByOwnerAlias(userAlias);
-        wallet.addAmount(amount);
+        boolean result = wallet.addAmount(amount);
+        if(!result){
+            return ResponseMaker.makeInvalidOperationResultResponse();
+        }
         walletRepository.save(wallet);
         Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.DEPOSIT);
         operationRepository.save(newOperation);
-        return true;
+        return ResponseMaker.makeOkResponse();
     }
 
-    private boolean makeExtraction(WalletRepository walletRepository, String userAlias, String amount) {
+    private JsonObject makeExtraction(WalletRepository walletRepository, String userAlias, String amount) {
         Wallet wallet = walletRepository.findWalletByOwnerAlias(userAlias);
-        wallet.extractAmount(amount);
+        boolean result = wallet.extractAmount(amount);
+        if(!result){
+            return ResponseMaker.makeInvalidOperationResultResponse();
+        }
         walletRepository.save(wallet);
         Operation newOperation = new Operation(wallet.getId(), wallet.getCurrency(), amount, getCurrentDate(), OperationTypes.OPERATION_TYPE.EXTRACTION);
         operationRepository.save(newOperation);
-        return true;
+        return ResponseMaker.makeOkResponse();
     }
 
     private String getCurrentDate(){
