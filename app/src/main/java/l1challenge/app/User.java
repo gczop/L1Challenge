@@ -1,5 +1,7 @@
 package l1challenge.app;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import l1challenge.app.wallet.ArsWallet;
 import l1challenge.app.wallet.UsdWallet;
 import l1challenge.app.wallet.UsdtWallet;
@@ -103,5 +105,18 @@ public class User {
 
     public UsdtWallet getUsdtWallet() {
         return this.usdtWallet;
+    }
+
+    public JsonElement toJsonObject() {
+        JsonObject jo = new JsonObject();
+        jo.addProperty("id", this.id);
+        jo.addProperty("alias", this.alias);
+        jo.addProperty("email", this.email);
+        jo.addProperty("name",this.name);
+        jo.addProperty("surname",this.surname);
+        jo.add("arsWallet", this.arsWallet.toJsonObject());
+        jo.add("usdWallet", this.usdWallet.toJsonObject());
+        jo.add("usdtWallet", this.usdtWallet.toJsonObject());
+        return jo;
     }
 }

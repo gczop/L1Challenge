@@ -8,6 +8,7 @@ import l1challenge.app.repositories.OperationRepository;
 import l1challenge.app.repositories.UsdWalletRepository;
 import l1challenge.app.repositories.UsdtWalletRepository;
 import l1challenge.app.utils.OperationTypes;
+import l1challenge.app.utils.ResponseMaker;
 import l1challenge.app.wallet.Wallet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,24 +34,39 @@ public class OperationController {
 
     @GetMapping(path="/operations")
     public @ResponseBody
-    JsonArray getUserOperations(@RequestParam String alias, @RequestParam(required = false) String currency, @RequestParam(required = false) String type, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Integer offset ) {
+    JsonObject getUserOperations(@RequestParam String alias, @RequestParam(required = false) String currency, @RequestParam(required = false) String type, @RequestParam(required = false) Integer limit, @RequestParam(required = false) Integer offset ) {
         Wallet arsWallet = arsWalletRepository.findWalletByOwnerAlias(alias);
         Wallet usdWallet = usdWalletRepository.findWalletByOwnerAlias(alias);
         Wallet usdtWallet = usdtWalletRepository.findWalletByOwnerAlias(alias);
+        if((arsWallet == null) ||(usdWallet == null) ||(usdtWallet == null) ){
+            return ResponseMaker.makeInvalidUserResponse();
+        }
+        if((currency != null) &&((!currency.equals("ARS")) && (!currency.equals("USD")) && (!currency.equals("USDT")))){
+            return ResponseMaker.makeInvalidCurrencyResponse();
+        }
+        if((type != null) && (!type.equals(OperationTypes.DEPOSIT)) &&(!type.equals(OperationTypes.EXTRACTION))){
+            return ResponseMaker.makeInvalidOperationTypeResponse();
+        }
+        if((limit != null)&&(limit<0)){
+            return ResponseMaker.makeInvalidLimitResponse();
+        }
+        if((offset != null)&&(offset<0)){
+            return ResponseMaker.makeInvalidOffsetResponse();
+        }
         List<Integer> idList = new ArrayList();
         idList.add(arsWallet.getId());
         idList.add(usdWallet.getId());
         idList.add(usdtWallet.getId());
-        Iterable<Operation> ops = operationsRepository.findOperationsWithFilters(idList, type, currency, (limit == null)?100:limit, (offset==null)?0:offset);
+        Iterable<Operation> ops = operationsRepository.findOperationsWithFilters(idList, type, currency, (limit == null)?2147483647 :limit, (offset==null)?0:offset);
         return mapOperationIterableToJsonArray(ops);
     }
 
-    private JsonArray mapOperationIterableToJsonArray(Iterable<Operation> collection){
+    private JsonObject mapOperationIterableToJsonArray(Iterable<Operation> collection){
         JsonArray ja = new JsonArray();
         for(Operation op : collection){
             ja.add(op.mapToJsonObject());
         }
-        return ja;
+        return ResponseMaker.makeOperationsResultResponse(ja);
     }
 
 

@@ -43,7 +43,10 @@ public class UserController {
     public @ResponseBody
     JsonObject addNewUser (@RequestParam String name, @RequestParam String surname, @RequestParam String alias, @RequestParam String email) {
         User n = new User(name, surname, email, alias);
-        //TODO: Chequear que no se repita email/alias. No repetir billeteras.
+        User selectedUser = userRepository.findByAlias(alias);
+        if(selectedUser != null){
+            return ResponseMaker.makeExistingUserResponse();
+        }
         userRepository.save(n);
         arsWalletRepository.save(n.getArsWallet());
         usdWalletRepository.save(n.getUsdWallet());
@@ -52,16 +55,18 @@ public class UserController {
     }
 
     @GetMapping(path="/user")
-    public @ResponseBody User getUser(@RequestParam String alias) {
+    public @ResponseBody JsonObject getUser(@RequestParam String alias) {
         User selectedUser = userRepository.findByAlias(alias);
-        //TODO: Ver de mejorar esto y que no tenga que usar repositorios.
+        if(selectedUser == null){
+            return ResponseMaker.makeInvalidUserResponse();
+        }
         ArsWallet userArsWallet = arsWalletRepository.findWalletByOwnerAlias(selectedUser.getAlias());
         UsdWallet userUsdWallet = usdWalletRepository.findWalletByOwnerAlias(selectedUser.getAlias());
         UsdtWallet userUsdtWallet = usdtWalletRepository.findWalletByOwnerAlias(selectedUser.getAlias());
         selectedUser.setArsWallet(userArsWallet);
         selectedUser.setUsdWallet(userUsdWallet);
         selectedUser.setUsdtWallet(userUsdtWallet);
-        return selectedUser;
+        return ResponseMaker.makeOkUserResponse(selectedUser);
     }
 
     @PostMapping(path="/user/deposit")
@@ -94,6 +99,9 @@ public class UserController {
 
     private JsonObject makeDeposit(WalletRepository walletRepository, String userAlias, String amount) {
         Wallet wallet = walletRepository.findWalletByOwnerAlias(userAlias);
+        if(wallet == null){
+            return ResponseMaker.makeInvalidUserResponse();
+        }
         boolean result = wallet.addAmount(amount);
         if(!result){
             return ResponseMaker.makeInvalidOperationResultResponse();

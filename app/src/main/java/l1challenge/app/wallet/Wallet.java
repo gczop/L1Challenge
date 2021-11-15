@@ -1,5 +1,7 @@
 package l1challenge.app.wallet;
 
+import com.google.gson.JsonObject;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -71,4 +73,11 @@ public abstract class Wallet {
     protected abstract int getCurrencyDecimals();
     public abstract String getCurrency();
 
+    public JsonObject toJsonObject(){
+        JsonObject jo = new JsonObject();
+        jo.addProperty("id", this.id);
+        jo.addProperty("ownerAlias", this.ownerAlias);
+        jo.addProperty("value", this.value);
+        return jo;
+    }
 }
